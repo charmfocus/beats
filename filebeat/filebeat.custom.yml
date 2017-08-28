@@ -199,7 +199,7 @@ setup.kibana:
 
 output.console:
   pretty: false
-  bulk_max_size: 0
+#  bulk_max_size: 0
 #================================ Logging =====================================
 
 # Sets log level. The default log level is info.
