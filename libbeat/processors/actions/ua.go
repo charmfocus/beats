@@ -5,7 +5,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/common"
 	"fmt"
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/pkg/errors"
 	"strings"
 	"xojoc.pw/useragent"
@@ -23,7 +22,7 @@ func init() {
 			allowedFields("fields", "target", "when")))
 }
 
-func newUA(c *common.Config) (processors.Processor, error) {
+func newUA(c common.Config) (processors.Processor, error) {
 	config := struct {
 		Fields []string    `config:"fields"`
 		Target string     `config:"target"`
@@ -43,7 +42,7 @@ func newUA(c *common.Config) (processors.Processor, error) {
 	return f, nil
 }
 
-func (f *ua) Run(event *beat.Event) (*beat.Event, error) {
+func (f ua) Run(event common.MapStr) (common.MapStr, error) {
 	var errs []string
 
 	for _, field := range f.Fields {
@@ -77,7 +76,7 @@ func (f *ua) Run(event *beat.Event) (*beat.Event, error) {
 			target = f.Target
 		}
 
-		_, err = event.PutValue(target, output)
+		_, err = event.Put(target, output)
 
 		if err != nil {
 			debug("Error trying to Put value %v for field : %s", output, field)
@@ -94,6 +93,6 @@ func (f *ua) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *ua) String() string {
+func (f ua) String() string {
 	return "ua=" + strings.Join(f.Fields, ", ")
 }

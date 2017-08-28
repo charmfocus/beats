@@ -5,7 +5,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/common"
 	"fmt"
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/pkg/errors"
 	"strings"
 	"time"
@@ -26,7 +25,7 @@ func init() {
 			allowedFields("fields", "in_location", "out_location", "target", "when")))
 }
 
-func newDate(c *common.Config) (processors.Processor, error) {
+func newDate(c common.Config) (processors.Processor, error) {
 	config := struct {
 		Fields      []string    `config:"fields"`
 		InLocation  string    `config:"in_location"`
@@ -40,7 +39,7 @@ func newDate(c *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the date configuration: %s", err)
 	}
 
-	f := &date{
+	f := date{
 		Fields:      config.Fields,
 		InLocation:  config.InLocation,
 		OutLocation: config.OutLocation,
@@ -50,7 +49,7 @@ func newDate(c *common.Config) (processors.Processor, error) {
 	return f, nil
 }
 
-func (f *date) Run(event *beat.Event) (*beat.Event, error) {
+func (f date) Run(event common.MapStr) (common.MapStr, error) {
 	var errs []string
 
 	for _, field := range f.Fields {
@@ -80,7 +79,7 @@ func (f *date) Run(event *beat.Event) (*beat.Event, error) {
 			target = f.Target
 		}
 
-		_, err = event.PutValue(target, output)
+		_, err = event.Put(target, output)
 
 		if err != nil {
 			debug("Error trying to Put value %v for field : %s", output, field)
@@ -153,6 +152,6 @@ func format(t interface{}, inLoc string, outLoc string) (tm string, err error) {
 	return "", nil
 }
 
-func (f *date) String() string {
+func (f date) String() string {
 	return "date=" + strings.Join(f.Fields, ", ")
 }

@@ -5,7 +5,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/common"
 	"fmt"
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/pkg/errors"
 	"strings"
 	"github.com/wangtuanjie/ip17mon"
@@ -24,7 +23,7 @@ func init() {
 			allowedFields("fields", "db_path", "target", "when")))
 }
 
-func newIpip(c *common.Config) (processors.Processor, error) {
+func newIpip(c common.Config) (processors.Processor, error) {
 	config := struct {
 		Fields []string    `config:"fields"`
 		DbPath string      `config:"db_path"`
@@ -51,7 +50,7 @@ func newIpip(c *common.Config) (processors.Processor, error) {
 	return f, nil
 }
 
-func (f *ipip) Run(event *beat.Event) (*beat.Event, error) {
+func (f ipip) Run(event common.MapStr) (common.MapStr, error) {
 	var errs []string
 
 	for _, field := range f.Fields {
@@ -72,7 +71,7 @@ func (f *ipip) Run(event *beat.Event) (*beat.Event, error) {
 
 		output := map[string]string{"country": loc.Country, "province": loc.Region, "city": loc.City, "isp": loc.Isp}
 
-		_, err = event.PutValue(f.Target, output)
+		_, err = event.Put(f.Target, output)
 
 		if err != nil {
 			debug("Error trying to Put value %v for field : %s", loc, field)
@@ -89,6 +88,6 @@ func (f *ipip) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *ipip) String() string {
+func (f ipip) String() string {
 	return "ipip=" + strings.Join(f.Fields, ", ")
 }

@@ -5,7 +5,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/common"
 	"fmt"
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +20,7 @@ func init() {
 			allowedFields("from", "target", "when")))
 }
 
-func newCopyField(c *common.Config) (processors.Processor, error) {
+func newCopyField(c common.Config) (processors.Processor, error) {
 	config := struct {
 		From   string    `config:"from"`
 		Target string     `config:"target"`
@@ -41,7 +40,7 @@ func newCopyField(c *common.Config) (processors.Processor, error) {
 	return f, nil
 }
 
-func (f *copyField) Run(event *beat.Event) (*beat.Event, error) {
+func (f copyField) Run(event common.MapStr) (common.MapStr, error) {
 	field := f.From
 	data, err := event.GetValue(field)
 	if err != nil && errors.Cause(err) != common.ErrKeyNotFound {
@@ -56,7 +55,7 @@ func (f *copyField) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	_, err = event.PutValue(f.Target, text)
+	_, err = event.Put(f.Target, text)
 
 	if err != nil {
 		debug("Error trying to Put value %v for field : %s", text, field)
@@ -66,6 +65,6 @@ func (f *copyField) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *copyField) String() string {
+func (f copyField) String() string {
 	return "copy_fields=" + f.From
 }

@@ -5,7 +5,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/common"
 	"fmt"
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/pkg/errors"
 	"strings"
 )
@@ -22,7 +21,7 @@ func init() {
 			allowedFields("fields", "target", "when")))
 }
 
-func newLowerCase(c *common.Config) (processors.Processor, error) {
+func newLowerCase(c common.Config) (processors.Processor, error) {
 	config := struct {
 		Fields      []string    `config:"fields"`
 		Target      string     `config:"target"`
@@ -42,7 +41,7 @@ func newLowerCase(c *common.Config) (processors.Processor, error) {
 	return f, nil
 }
 
-func (f *lowerCase) Run(event *beat.Event) (*beat.Event, error) {
+func (f *lowerCase) Run(event common.MapStr) (common.MapStr, error) {
 	var errs []string
 
 	for _, field := range f.Fields {
@@ -66,7 +65,7 @@ func (f *lowerCase) Run(event *beat.Event) (*beat.Event, error) {
 			target = f.Target
 		}
 
-		_, err = event.PutValue(target, output)
+		_, err = event.Put(target, output)
 
 		if err != nil {
 			debug("Error trying to Put value %v for field : %s", output, field)
@@ -83,6 +82,6 @@ func (f *lowerCase) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *lowerCase) String() string {
+func (f lowerCase) String() string {
 	return "lower_case=" + strings.Join(f.Fields, ", ")
 }
