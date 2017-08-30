@@ -79,7 +79,15 @@ func (f date) Run(event common.MapStr) (common.MapStr, error) {
 			target = f.Target
 		}
 
-		_, err = event.Put(target, output)
+		if target == "@timestamp" {
+			_timestamp, err := time.Parse(time.RFC3339, output)
+			if err == nil {
+				_, err = event.Put(target, _timestamp)
+			}
+		} else {
+			_, err = event.Put(target, output)
+		}
+
 
 		if err != nil {
 			debug("Error trying to Put value %v for field : %s", output, field)
