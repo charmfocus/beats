@@ -111,7 +111,7 @@ processors:
       target: "@type"
 
   - drop_fields:
-      fields: ["message", "beat", "input_type", "@metadata", "source", "offset", "prospector", "ua.original"]
+      fields: ["beat", "input_type", "@metadata", "source", "offset", "prospector", "ua.original"]
 
 
 #================================ General =====================================
