@@ -79,13 +79,17 @@ func (f date) Run(event common.MapStr) (common.MapStr, error) {
 			target = f.Target
 		}
 
+		tm := output.Format(time.RFC3339)
 		if target == "@timestamp" {
-			_timestamp, err := time.Parse(time.RFC3339, output)
 			if err == nil {
-				_, err = event.Put(target, _timestamp)
+				_, err = event.Put(target, common.Time(*output))
 			}
 		} else {
-			_, err = event.Put(target, output)
+			_, err = event.Put(target, tm)
+		}
+
+		if field != "@timestamp" && target != field {
+			event.Put(field, tm)
 		}
 
 
@@ -104,13 +108,17 @@ func (f date) Run(event common.MapStr) (common.MapStr, error) {
 	return event, nil
 }
 
-func format(t interface{}, inLoc string, outLoc string) (tm string, err error) {
+func format(t interface{}, inLoc string, outLoc string) (*time.Time, error) {
 
 	if inLoc == "" {
 		inLoc = "UTC"
 	}
 
-	inloc, err := time.LoadLocation(inLoc)
+	var err error
+	var inloc *time.Location
+	var tm time.Time
+
+	inloc, err = time.LoadLocation(inLoc)
 
 	var outloc *time.Location
 	if outLoc == "" || outLoc == inLoc {
@@ -120,44 +128,48 @@ func format(t interface{}, inLoc string, outLoc string) (tm string, err error) {
 	}
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	switch t.(type) {
 	case string:
 		ts := t.(string)
-		tm, err := time.ParseInLocation(time.RFC3339, ts, inloc)
+		tm, err = time.ParseInLocation(time.RFC3339, ts, inloc)
 		if err != nil {
 			tm, err = time.ParseInLocation("2006-01-02 15:04:05", ts, inloc)
 		}
 
 		if err != nil {
-			var ut, err = strconv.ParseInt(ts, 10, 64)
+			var ut int64
+			ut, err = strconv.ParseInt(ts, 10, 64)
 			if err != nil {
-				return "", err
+				return nil, err
 			}
 
-			tm, err = time.ParseInLocation(time.RFC3339, time.Unix(ut, 0).
-				Format(time.RFC3339), inloc)
+			tm = time.Unix(ut, 0)
+			err = nil
 		}
 
-		return tm.In(outloc).Format(time.RFC3339), err
+		timeObj := tm.In(outloc)
+		return &timeObj, err
 	case int:
-		tm, err := time.Parse(time.RFC3339, time.Unix(int64(t.(int)), 0).
+		tm, err = time.Parse(time.RFC3339, time.Unix(int64(t.(int)), 0).
 			Format(time.RFC3339))
-		return tm.In(outloc).Format(time.RFC3339), err
+		timeObj := tm.In(outloc)
+		return &timeObj, err
 	case int32:
-		tm, err := time.Parse(time.RFC3339, time.Unix(int64(t.(int32)), 0).
+		tm, err = time.Parse(time.RFC3339, time.Unix(int64(t.(int32)), 0).
 			Format(time.RFC3339))
-		return tm.In(outloc).Format(time.RFC3339), err
+		timeObj := tm.In(outloc)
+		return &timeObj, err
 	case int64:
-		tm, err := time.Parse(time.RFC3339, time.Unix(t.(int64), 0).
+		tm, err = time.Parse(time.RFC3339, time.Unix(t.(int64), 0).
 			Format(time.RFC3339))
-
-		return tm.In(outloc).Format(time.RFC3339), err
+		timeObj := tm.In(outloc)
+		return &timeObj, err
 	}
 
-	return "", nil
+	return nil, nil
 }
 
 func (f date) String() string {

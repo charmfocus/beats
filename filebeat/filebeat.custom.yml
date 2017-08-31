@@ -111,7 +111,7 @@ processors:
       target: "@type"
 
   - drop_fields:
-      fields: ["message", "beat", "input_type", "@metadata", "source", "offset", "prospector", "ua.original"]
+      fields: ["message", "beat", "input_type", "source", "offset", "prospector", "ua.original"]
 
 
 #================================ General =====================================
@@ -173,15 +173,21 @@ setup.kibana:
 # Multiple outputs may be used.
 
 #-------------------------- Elasticsearch output ------------------------------
-#output.elasticsearch:
+output.elasticsearch:
   # Array of hosts to connect to.
-#  hosts: ["localhost:9200"]
+  hosts: ["192.168.0.220:9200"]
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
   #username: "elastic"
   #password: "changeme"
+  index: "logs-%{+yyyy.MM.dd}"
+  #  indices:
+  #    - index: "lingpao-client-stats-%{[data.platform_id]}-%{[data.project_id]}-%{[data.subproject_id]}-%{[data.version_code]}-%{+yyyy.MM.dd}"
 
+  template.enabled: false
+  template.versions.2x.enabled: false
+  template.versions.6x.enabled: false
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts
@@ -197,8 +203,8 @@ setup.kibana:
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
 
-output.console:
-  pretty: false
+#output.console:
+#  pretty: false
 #  bulk_max_size: 0
 #================================ Logging =====================================
 
