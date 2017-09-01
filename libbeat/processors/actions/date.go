@@ -60,16 +60,16 @@ func (f date) Run(event common.MapStr) (common.MapStr, error) {
 			continue
 		}
 
-		text, ok := data.(string)
+		//text, ok := data.(string)
+		//
+		//if !ok {
+		//	continue
+		//}
 
-		if !ok {
-			continue
-		}
-
-		output, err := format(text, f.InLocation, f.OutLocation)
+		output, err := format(data, f.InLocation, f.OutLocation)
 
 		if err != nil {
-			debug("Error trying to format date %v for field : %s", text, field)
+			debug("Error trying to format date %v for field : %s", output, field)
 			errs = append(errs, err.Error())
 			continue
 		}
@@ -167,6 +167,12 @@ func format(t interface{}, inLoc string, outLoc string) (*time.Time, error) {
 			Format(time.RFC3339))
 		timeObj := tm.In(outloc)
 		return &timeObj, err
+	case time.Time:
+		timeObj := t.(time.Time).In(outloc)
+		return &timeObj, nil
+	case common.Time:
+		timeObj := time.Time(t.(common.Time)).In(outloc)
+		return &timeObj, nil
 	}
 
 	return nil, nil

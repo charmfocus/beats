@@ -95,8 +95,8 @@ processors:
       target: "area"
       db_path: "/www/test/17monipdb/17monipdb.dat"
   - date:
-      fields: ["data.timestamp"]
-      target: "@timestamp"
+      fields: ["@timestamp"]
+#      target: "@timestamp"
       in_location: "UTC"
       out_location: "PRC"
   - ua:
@@ -184,7 +184,7 @@ output.elasticsearch:
   index: "logs-%{+yyyy.MM.dd}"
   #  indices:
   #    - index: "lingpao-client-stats-%{[data.platform_id]}-%{[data.project_id]}-%{[data.subproject_id]}-%{[data.version_code]}-%{+yyyy.MM.dd}"
-
+  timezone: "Asia/Shanghai"
   template.enabled: false
   template.versions.2x.enabled: false
   template.versions.6x.enabled: false
