@@ -6,11 +6,13 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
+	"runtime"
 )
+const MAX_PUBLISH_CNT int = 5
 
 type syncLogPublisher struct {
 	pub    publisher.Publisher
-	client publisher.Client
+	client [MAX_PUBLISH_CNT]publisher.Client
 	in     chan []*input.Event
 	out    SuccessLogger
 
@@ -32,25 +34,33 @@ func newSyncLogPublisher(
 }
 
 func (p *syncLogPublisher) Start() {
-	p.client = p.pub.Connect()
+	for index := 0; index < MAX_PUBLISH_CNT; index++ {
+		p.client[index] = p.pub.Connect()
+	}
 
-	p.wg.Add(1)
-	go func() {
-		defer p.wg.Done()
+	//p.client = p.pub.Connect()
 
-		logp.Info("Start sending events to output")
-		defer logp.Debug("publisher", "Shutting down sync publisher")
+	p.wg.Add(MAX_PUBLISH_CNT)
+	runtime.GOMAXPROCS(MAX_PUBLISH_CNT)
+	for index := 0; index < MAX_PUBLISH_CNT; index++ {
+		go func(index int) {
+			defer p.wg.Done()
 
-		for {
-			err := p.Publish()
-			if err != nil {
-				return
+			logp.Info("Start sending events to output")
+			defer logp.Debug("publisher", "Shutting down sync publisher")
+
+			for {
+				err := p.Publish(index)
+				if err != nil {
+					return
+				}
 			}
-		}
-	}()
+		}(index)
+	}
+
 }
 
-func (p *syncLogPublisher) Publish() error {
+func (p *syncLogPublisher) Publish(index int) error {
 	var events []*input.Event
 	select {
 	case <-p.done:
@@ -59,7 +69,7 @@ func (p *syncLogPublisher) Publish() error {
 	}
 
 	dataEvents, meta := getDataEvents(events)
-	ok := p.client.PublishEvents(dataEvents, publisher.Sync, publisher.Guaranteed,
+	ok := p.client[index].PublishEvents(dataEvents, publisher.Sync, publisher.Guaranteed,
 		publisher.MetadataBatch(meta))
 	if !ok {
 		// PublishEvents will only returns false, if p.client has been closed.
@@ -80,7 +90,10 @@ func (p *syncLogPublisher) Publish() error {
 }
 
 func (p *syncLogPublisher) Stop() {
-	p.client.Close()
+	for _, client := range p.client {
+		client.Close()
+
+	}
 	close(p.done)
 	p.wg.Wait()
 }

@@ -86,8 +86,8 @@ processors:
       target: ""
       overwrite_keys: true
 
-  - decode_json_fields:
-      fields: ["data"]
+#  - decode_json_fields:
+#      fields: ["data"]
 #      target: "data.data"
 
   - ipip:
@@ -189,10 +189,10 @@ output.elasticsearch:
   index: "logs-%{+yyyy.MM.dd}"
   #  indices:
   #    - index: "lingpao-client-stats-%{[data.platform_id]}-%{[data.project_id]}-%{[data.subproject_id]}-%{[data.version_code]}-%{+yyyy.MM.dd}"
-  timezone: "Asia/Shanghai"
   template.enabled: false
   template.versions.2x.enabled: false
   template.versions.6x.enabled: false
+  pipeline: "stats-type"
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts
@@ -208,8 +208,8 @@ output.elasticsearch:
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
 
-#output.console:
-#  pretty: false
+output.console:
+  pretty: false
 #  bulk_max_size: 0
 #================================ Logging =====================================
 

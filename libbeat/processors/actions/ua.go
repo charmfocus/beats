@@ -61,6 +61,10 @@ func (f ua) Run(event common.MapStr) (common.MapStr, error) {
 
 		_ua := useragent.Parse(text)
 
+		if _ua == nil {
+			continue
+		}
+
 		output := map[string]interface{}{
 			"version": _ua.Version,
 			"mobile": _ua.Mobile,
