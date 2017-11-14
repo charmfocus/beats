@@ -9,6 +9,7 @@
 
 === Beats version HEAD
 https://github.com/elastic/beats/compare/v5.5.1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.6.3...5.6[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -28,6 +29,8 @@ https://github.com/elastic/beats/compare/v5.5.1...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix race condition in internal logging rotator. {pull}4519[4519]
+
 *Filebeat*
 
 *Heartbeat*
@@ -36,11 +39,16 @@ https://github.com/elastic/beats/compare/v5.5.1...master[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix missing length check in the PostgreSQL module. {pull}5457[5457]
+
 *Winlogbeat*
 
 ==== Added
 
 *Affecting all Beats*
+
+- Add support for enabling TLS renegotiation. {issue}4386[4386]
+- Add setting to enable/disable the slow start in logstash output. {pull}5400[5400]
 
 *Filebeat*
 
@@ -81,6 +89,87 @@ https://github.com/elastic/beats/compare/v5.5.1...master[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.6.3]]
+=== Beats version 5.6.3
+https://github.com/elastic/beats/compare/v5.6.2...v5.6.3[View commits]
+
+No changes in this release.
+
+[[release-notes-5.6.2]]
+=== Beats version 5.6.2
+https://github.com/elastic/beats/compare/v5.6.1...v5.6.2[View commits]
+
+No changes in this release.
+
+[[release-notes-5.6.1]]
+=== Beats version 5.6.1
+https://github.com/elastic/beats/compare/v5.6.0...v5.6.1[View commits]
+
+No changes in this release.
+
+[[release-notes-5.6.0]]
+=== Beats version 5.6.0
+https://github.com/elastic/beats/compare/v5.5.3...v5.6.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The _all.norms setting in the Elasticsearch template is no longer disabled.
+  This increases the storage size with one byte per document, but allows for a
+  better upgrade experience to 6.0. {issue}4901[4901]
+
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
+
+*Packetbeat*
+
+- Update flow timestamp on each packet being received. {issue}4895[4895]
+
+*Metricbeat*
+
+- Fix a debug statement that said a module wrapper had stopped when it hadn't. {pull}4264[4264]
+- Use MemAvailable value from /proc/meminfo on Linux 3.14. {pull}4316[4316]
+- Fix panic when events were dropped by filters. {issue}4327[4327]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add option to the import_dashboards script to load the dashboards via Kibana API. {pull}4682[4682]
+- Add `logging.files` `permissions` option. {pull}4295[4295]
+
+*Filebeat*
+
+- Add support for loading Xpack Machine Learning configurations from the modules, and added sample configurations for the Nginx module. {pull}4506[4506] {pull}4609[4609]
+-  Add ability to parse nginx logs exposing the X-Forwarded-For header instead of the remote address. {pull}4351[4351]
+
+*Metricbeat*
+
+- Add `filesystem.ignore_types` to system module for ignoring filesystem types. {issue}4685[4685]
+
+==== Deprecated
+
+*Affecting all Beats*
+
+- Loading more than one output is deprecated and will be removed in 6.0. {pull}4907[4907]
+
+[[release-notes-5.5.3]]
+=== Beats version 5.5.3
+https://github.com/elastic/beats/compare/v5.5.2...v5.5.3[View commits]
+
+No changes in this release.
+
+[[release-notes-5.5.2]]
+=== Beats version 5.5.2
+https://github.com/elastic/beats/compare/v5.5.1...v5.5.2[View commits]
+
+No changes in this release.
 
 [[release-notes-5.5.1]]
 === Beats version 5.5.1

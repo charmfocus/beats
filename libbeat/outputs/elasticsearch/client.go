@@ -605,6 +605,11 @@ func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte
 	return body, nil
 }
 
+// GetVersion returns the elasticsearch version the client is connected to
+func (client *Client) GetVersion() string {
+	return client.Connection.version
+}
+
 // CheckTemplate checks if a given template already exist. It returns true if
 // and only if Elasticsearch returns with HTTP status code 200.
 func (client *Client) CheckTemplate(templateName string) bool {
@@ -729,6 +734,10 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		return status, nil, retErr
 	}
 	return status, obj, retErr
+}
+
+func (conn *Connection) GetVersion() string {
+	return conn.version
 }
 
 func closing(c io.Closer) {
