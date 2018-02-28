@@ -61,17 +61,17 @@ func (f ua) Run(event common.MapStr) (common.MapStr, error) {
 
 		_ua := useragent.Parse(text)
 
-		if _ua == nil {
-			continue
-		}
+		var output map[string]interface{}
 
-		output := map[string]interface{}{
-			"version": _ua.Version,
-			"mobile": _ua.Mobile,
-			"name": _ua.Name,
-			"os":_ua.OS,
-			"os_version":_ua.OSVersion,
-			"tablet":_ua.Tablet,
+		if _ua != nil {
+			output = map[string]interface{}{
+				"version": _ua.Version,
+				"mobile": _ua.Mobile,
+				"name": _ua.Name,
+				"os":_ua.OS,
+				"os_version":_ua.OSVersion,
+				"tablet":_ua.Tablet,
+			}
 		}
 
 		target := field

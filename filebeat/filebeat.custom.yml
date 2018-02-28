@@ -178,21 +178,21 @@ setup.kibana:
 # Multiple outputs may be used.
 
 #-------------------------- Elasticsearch output ------------------------------
-output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["192.168.0.220:9200"]
-
-  # Optional protocol and basic auth credentials.
-  #protocol: "https"
-  #username: "elastic"
-  #password: "changeme"
-  index: "logs-%{+yyyy.MM.dd}"
-  #  indices:
-  #    - index: "lingpao-client-stats-%{[data.platform_id]}-%{[data.project_id]}-%{[data.subproject_id]}-%{[data.version_code]}-%{+yyyy.MM.dd}"
-  template.enabled: false
-  template.versions.2x.enabled: false
-  template.versions.6x.enabled: false
-  pipeline: "stats-type"
+#output.elasticsearch:
+#  # Array of hosts to connect to.
+#  hosts: ["192.168.0.220:9200"]
+#
+#  # Optional protocol and basic auth credentials.
+#  #protocol: "https"
+#  #username: "elastic"
+#  #password: "changeme"
+#  index: "logs-%{+yyyy.MM.dd}"
+#  #  indices:
+#  #    - index: "lingpao-client-stats-%{[data.platform_id]}-%{[data.project_id]}-%{[data.subproject_id]}-%{[data.version_code]}-%{+yyyy.MM.dd}"
+#  template.enabled: false
+#  template.versions.2x.enabled: false
+#  template.versions.6x.enabled: false
+#  pipeline: "stats-type"
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts

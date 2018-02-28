@@ -68,6 +68,11 @@ func (f ipip) Run(event common.MapStr) (common.MapStr, error) {
 		}
 
 		loc, err := ip17mon.Find(text)
+		if err != nil {
+			debug("Error ip [%s] convert to loc failed: %s", text, err)
+			errs = append(errs, err.Error())
+			continue
+		}
 
 		output := map[string]string{"country": loc.Country, "province": loc.Region, "city": loc.City, "isp": loc.Isp}
 
