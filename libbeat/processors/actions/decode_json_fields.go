@@ -1,7 +1,7 @@
 package actions
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"fmt"
 	"strings"
 
@@ -12,8 +12,10 @@ import (
 	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/json-iterator/go"
 )
 
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 type decodeJSONFields struct {
 	fields        []string
 	maxDepth      int
