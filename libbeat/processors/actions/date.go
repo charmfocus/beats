@@ -82,17 +82,10 @@ func (f *date) Run(event *beat.Event) (*beat.Event, error) {
 
 		tm := output.Format(time.RFC3339)
 		if target == "@timestamp" {
-			if err == nil {
-				_, err = event.PutValue(target, common.Time(*output))
-			}
+			event.Timestamp = *output
 		} else {
 			_, err = event.PutValue(target, tm)
 		}
-
-		if field != "@timestamp" && target != field {
-			event.PutValue(field, tm)
-		}
-
 
 		if err != nil {
 			debug("Error trying to Put value %v for field : %s", output, field)

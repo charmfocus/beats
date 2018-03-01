@@ -76,8 +76,11 @@ func (f *dateLocation) Run(event *beat.Event) (*beat.Event, error) {
 			localTime = time.Time(data.(common.Time)).In(local)
 		}
 
-		_, err = event.PutValue(field, common.Time(localTime))
-
+		if field == "@timestamp" {
+			event.Timestamp = localTime
+		} else {
+			_, err = event.PutValue(field, common.Time(localTime))
+		}
 
 		if err != nil {
 			debug("Error trying to Put value %v for field : %s", localTime.Format(time.RFC3339), field)

@@ -26,9 +26,12 @@ filebeat.prospectors:
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
 #    - /var/log/*.log
+#    - /data/logs/nginx/stats/*.log
     - /www/test/logs/*.log
+#    - /data/logs/nginx/stats/test.log
     #- c:\programdata\elasticsearch\logs\*
 
+  harvester_buffer_size: 40960000
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list.
   #exclude_lines: ['^DBG']
@@ -46,7 +49,7 @@ filebeat.prospectors:
   fields_under_root: true
   fields:
     "@type": logs
-    "review": 1
+    #"data.version_code": "1"
 
   ### Multiline options
 
@@ -80,6 +83,7 @@ filebeat.config.modules:
   # Period on which files under path should be checked for changes
   #reload.period: 10s
 
+
 processors:
   - decode_json_fields:
       fields: ["message"]
@@ -93,42 +97,31 @@ processors:
   - ipip:
       fields: ["ip"]
       target: "area"
+#      db_path: "/usr/local/filebeat/17monipdb.dat"
       db_path: "/www/test/17monipdb/17monipdb.dat"
-  - date:
-      fields: ["@timestamp"]
-      target: "@timestamp"
-      in_location: "UTC"
-      out_location: "PRC"
-
-#  - date_location:
+      #db_path: "/root/docker/filebeat-docker/filebeat/17monipdb.dat"
+#  - date:
 #      fields: ["@timestamp"]
-#      location: "PRC"
-
+#      #target: "@timestamp"
+#      in_location: "UTC"
+#      out_location: "PRC"
+  - date_location:
+      fields: ["@timestamp"]
+      location: "PRC"
   - ua:
       fields: ["agent"]
 #      target: "ua"
 
   - lower_case:
-      fields: ["flag"]
+      fields: ["data.flag"]
 
   - copy_field:
-      from: "flag"
+      from: "data.flag"
       target: "@type"
 
+
   - drop_fields:
-      fields: ["message", "beat", "input_type", "source", "offset", "prospector", "ua.original"]
-
-#==================== Elasticsearch template setting ==========================
-
-#setup.template.settings:
-#  index.number_of_shards: 3
-#  index.codec: best_compression
-#  #_source.enabled: false
-setup.template.name: "lingpao-client-stats"
-setup.template.pattern: "lingpao-client-stats-*"
-setup.template.enabled: false
-#setup.template.versions.6x.enabled: true
-#setup.template.versions.6x.path: /www/go/src/github.com/elastic/beats/filebeat/es.template.json
+      fields: ["message", "beat", "input_type", "@metadata", "source", "offset", "prospector", "ua.original", "data.@timestamp"]
 
 #================================ General =====================================
 
@@ -188,22 +181,41 @@ setup.kibana:
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
 
-#-------------------------- Elasticsearch output ------------------------------
-output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["192.168.0.168:9200"]
+#==================== Elasticsearch template setting ==========================
 
-  # Optional protocol and basic auth credentials.
-  #protocol: "https"
-  #username: "elastic"
-  #password: "changeme"
-  index: "lingpao-client-stats"
-  indices:
-    - index: "lingpao-client-stats-%{[data.platform_id]}-%{[data.project_id]}-%{[data.subproject_id]}-%{[data.version_code]}-%{+yyyy.MM.dd}"
-  template.enabled: false
-  template.versions.2x.enabled: false
-  template.versions.6x.enabled: false
-#  pipeline: "stats-type"
+#setup.template.settings:
+#  index.number_of_shards: 3
+#  index.codec: best_compression
+#  #_source.enabled: false
+setup.template.name: "lingpao-client-stats"
+setup.template.pattern: "lingpao-client-stats-*"
+setup.template.enabled: false
+
+#-------------------------- Elasticsearch output ------------------------------
+#output.elasticsearch:
+##  worker: 15
+##  bulk_max_size: 15000
+##  flush_interval: 1s
+#  # Array of hosts to connect to.
+#  hosts: ["192.168.0.168:9200"]
+#
+#  # Optional protocol and basic auth credentials.
+#  #protocol: "https"
+#  #username: "elastic"
+#  #password: "changeme"
+#  index: "logs-%{+yyyy.MM.dd}"
+#  indices:
+#    - index: "lingpao-client-stats-%{[data.platform_id]}-%{[data.project_id]}-%{[data.subproject_id]}-%{[data.version_code]}-%{+yyyy.MM.dd}"
+
+  #pipeline: "stats-type"
+#  template.enabled: true
+#  template.name: "lingpao-client-stats"
+#  template.overwrite: true
+#  #template.path: "${path.config}/es.json"
+#  template.versions.6x.path: "${path.config}/es.json"
+#  template.enabled: false
+#  template.versions.2x.enabled: false
+#  template.versions.6x.enabled: true
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts
@@ -219,8 +231,8 @@ output.elasticsearch:
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
 
-#output.console:
-#  pretty: false
+output.console:
+  pretty: false
 #  bulk_max_size: 0
 #================================ Logging =====================================
 
